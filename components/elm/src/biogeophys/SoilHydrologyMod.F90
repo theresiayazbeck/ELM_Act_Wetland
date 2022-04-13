@@ -262,7 +262,8 @@ contains
      use elm_varpar       , only : nlevsoi, nlevgrnd
      use elm_varcon       , only : denh2o, denice, roverg, wimp, pc, mu, tfrz
      use column_varcon    , only : icol_roof, icol_road_imperv, icol_sunwall, icol_shadewall, icol_road_perv
-     use landunit_varcon  , only : istsoil, istcrop
+     use landunit_varcon   , only : istwet
+  use landunit_varcon  , only : istsoil, istcrop
      !
      ! !ARGUMENTS:
      type(bounds_type)        , intent(in)    :: bounds
@@ -375,7 +376,7 @@ contains
        do fc = 1, num_hydrologyc
           c = filter_hydrologyc(fc)
           ! partition moisture fluxes between soil and h2osfc
-          if (lun_pp%itype(col_pp%landunit(c)) == istsoil .or. lun_pp%itype(col_pp%landunit(c))==istcrop) then
+          if (( lun_pp%itype(col_pp%landunit(c)) == istsoil .or. lun_pp%itype(col_pp%landunit(c)) == istwet ) .or. lun_pp%itype(col_pp%landunit(c))==istcrop) then
 
              ! explicitly use frac_sno=0 if snl=0
              if (snl(c) >= 0) then

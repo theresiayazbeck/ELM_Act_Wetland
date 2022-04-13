@@ -405,7 +405,8 @@ contains
     ! Time step initialization
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istwet
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istwet
     !
     ! !ARGUMENTS:
     class(photosyns_type) :: this
@@ -444,9 +445,8 @@ contains
              this%c14_psnsha_patch(p) = 0._r8
           endif
        end if
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop &
-            .or. lun_pp%itype(l) == istice .or. lun_pp%itype(l) == istice_mec &
-            .or. lun_pp%itype(l) == istwet) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop &
+            .or. lun_pp%itype(l) == istice .or. lun_pp%itype(l) == istice_mec) then
           if (use_c13) then
              this%rc13_canair_patch(p) = 0._r8
              this%rc13_psnsun_patch(p) = 0._r8
@@ -463,7 +463,8 @@ contains
     ! Time step initialization
     !
     ! !USES:
-    use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istwet
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istsoil, istcrop, istice, istice_mec, istwet
     !
     ! !ARGUMENTS:
     type(photosyns_type), intent(inout) :: photosyns_vars
@@ -502,9 +503,8 @@ contains
              photosyns_vars%c14_psnsha_patch(p) = 0._r8
           endif
        end if
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop &
-            .or. lun_pp%itype(l) == istice .or. lun_pp%itype(l) == istice_mec &
-            .or. lun_pp%itype(l) == istwet) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop &
+            .or. lun_pp%itype(l) == istice .or. lun_pp%itype(l) == istice_mec) then
           if (use_c13) then
              photosyns_vars%rc13_canair_patch(p) = 0._r8
              photosyns_vars%rc13_psnsun_patch(p) = 0._r8

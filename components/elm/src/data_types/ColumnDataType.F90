@@ -33,6 +33,7 @@ module ColumnDataType
   use soilorder_varcon, only : smax, ks_sorption
   use clm_time_manager, only : is_restart, get_nstep
   use clm_time_manager, only : is_first_step, get_step_size
+  use landunit_varcon   , only : istwet
   use landunit_varcon , only : istice, istwet, istsoil, istdlak, istcrop, istice_mec
   use column_varcon   , only : icol_road_perv, icol_road_imperv, icol_roof, icol_sunwall, icol_shadewall
   use histFileMod     , only : hist_addfld1d, hist_addfld2d, no_snow_normal
@@ -1008,7 +1009,8 @@ contains
   subroutine col_es_init(this, begc, endc)
     !
     ! !USES:
-    use landunit_varcon, only : istice, istwet, istsoil, istdlak, istice_mec
+    use landunit_varcon   , only : istwet
+  use landunit_varcon, only : istice, istwet, istsoil, istdlak, istice_mec
     use elm_varctl     , only : iulog, use_cn, use_vancouver, use_mexicocity
     use column_varcon  , only : icol_road_perv, icol_road_imperv, icol_roof, icol_sunwall, icol_shadewall
     use UrbanParamsType, only : urbanparams_vars
@@ -1584,7 +1586,7 @@ contains
        if (.not. lun_pp%lakpoi(l)) then  !not lake
 	       nlevbed = col_pp%nlevbed(c)
           ! volumetric water
-          if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+          if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
              nlevs = nlevgrnd
              do j = 1, nlevs
                 if (j > nlevbed) then
@@ -1863,7 +1865,7 @@ contains
              end if
              do j = 1,nlevs
                 l = col_pp%landunit(c)
-                if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+                if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
                    this%h2osoi_liq(c,j) = max(0._r8,this%h2osoi_liq(c,j))
                    this%h2osoi_ice(c,j) = max(0._r8,this%h2osoi_ice(c,j))
                    this%h2osoi_vol(c,j) = this%h2osoi_liq(c,j)/(col_pp%dz(c,j)*denh2o) &
@@ -2267,7 +2269,7 @@ contains
 
     do c = begc, endc
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           if (.not. present(c12_carbonstate_vars)) then ! initializing a c12 type
              do j = 1, nlevdecomp
                 do k = 1, ndecomp_pools
@@ -3328,7 +3330,7 @@ contains
 
     do c = begc, endc
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
           ! column nitrogen state variables
           this%ntrunc(c) = 0._r8
@@ -4321,7 +4323,7 @@ contains
 
     do c = begc, endc
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
 
           ! column phosphorus state variables
           this%ptrunc(c) = 0._r8
@@ -5460,7 +5462,7 @@ contains
     ! needed for CNNLeaching
     do c = begc, endc
        l = col_pp%landunit(c)
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%qflx_drain(c) = 0._r8
           this%qflx_surf(c)  = 0._r8
        end if
@@ -6585,7 +6587,7 @@ contains
        end if
 
        this%fphr(c,nlevdecomp+1:nlevgrnd) = 0._r8 !used to be in ch4Mod
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%fphr(c,nlevdecomp+1:nlevgrnd) = 0._r8
        else if (lun_pp%itype(l) == istdlak .and. allowlakeprod) then
           this%fphr(c,:) = spval
@@ -6595,7 +6597,7 @@ contains
 
        ! also initialize dynamic landcover fluxes so that they have
        ! real values on first timestep, prior to calling pftdyn_cnbal
-       if (lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istcrop) then
+       if (( lun_pp%itype(l) == istsoil .or. lun_pp%itype(l) == istwet ) .or. lun_pp%itype(l) == istcrop) then
           this%dwt_conv_cflux(c)        = 0._r8
           this%dwt_prod10c_gain(c)      = 0._r8
           this%dwt_prod100c_gain(c)     = 0._r8
