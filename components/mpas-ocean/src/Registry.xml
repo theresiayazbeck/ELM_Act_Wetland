@@ -337,8 +337,12 @@
 					possible_values="greater than zero and less than 1"
 		/>
 		<nml_option name="config_Redi_N2_based_taper_limit_term1" type="logical" default_value=".true." units="unitless"
-					description="If true, the N2 lim iting is applied to the horizontal diffusion term"
+					description="If true, the N2 limiting is applied to the horizontal diffusion term"
 					possible_values=".true. or .false."
+		/>
+		<nml_option name="config_Redi_min_layers_diag_terms" type="integer" default_value="6" units="NA"
+					description="Redi diagonal terms (2 and 3) are turned off from layer 1 through config_Redi_min_layers_diag_terms-1, and on from config_Redi_min_layers_diag_terms to nVertLevels. The Redi diagonal terms are not guaranteed to produce bounded tracer fields, and in practice produce growing temperatures in a few columns with fewer than 5 vertical cells. Redi is meant for isopycnal mixing in the deep ocean, so not applying Redi diagonal terms in very shallow regions is an acceptable solution."
+					possible_values="any integer between 0 (all layers on) and nVertLevels (all layers off)"
 		/>
 	</nml_record>
 	<nml_record name="GM_eddy_parameterization" mode="forward">
@@ -353,9 +357,13 @@
 		<nml_option name="config_GM_constant_kappa" type="real" default_value="600.0" units="m^2 s^{-1}"
 					description="Coefficient of standard GM parametrization of eddy transport (Bolus component), $\kappa$. Only used when config_GM_closure is set to constant."
 		/>
-		<nml_option name="config_GM_constant_gravWaveSpeed" type="real" default_value="0.3" units="m/s"
-					description="Gravity wave speed for the vertical stream function boundary value problem. This appears as $c$ in eqn 16a of Ferrari et al. 2010 (https://doi.org/10.1016/j.ocemod.2010.01.004)."
+		<nml_option name="config_GM_constant_bclModeSpeed" type="real" default_value="0.3" units="m/s"
+					description="The parameter setting for the first baroclinic mode speed for the vertical stream function boundary value problem. This appears as $c$ in eqn 16a of Ferrari et al. 2010 (https://doi.org/10.1016/j.ocemod.2010.01.004)."
 					possible_values="Positive real numbers"
+		/>
+		<nml_option name="config_GM_minBclModeSpeed_method" type="character" default_value="constant" units="NA"
+					description="Determines how the GM setting for the minimum of the first baroclinic mode speed is computed. If 'constant' then use config_GM_constant_bclModeSpeed. If 'computed' then compute at every edge at every time step using the Brunt-Vaisala frequency"
+					possible_values="'constant' and 'computed'"
 		/>
 		<nml_option name="config_GM_spatially_variable_min_kappa" type="real" default_value="300.0" units="m^2 s^{-1}"
 					description="minimum value of bolus diffusivity for spatially variable GM schemes. Used for all choices of config_GM_closure other than 'constant'."
@@ -1010,7 +1018,7 @@
 					possible_values=".true. or .false."
 		/>
 		<nml_option name="config_thickness_flux_type" type="character" default_value="centered" units="unitless"
-					description="If 'upwind', use upwind to evaluate the edge-value for layerThickness, i.e., layerThicknessEdge.  The standard MPAS-O approach is 'centered'."
+					description="If 'upwind', use upwind to evaluate the edge-value for layerThickness, i.e., layerThickEdgeFlux.  The standard MPAS-O approach is 'centered'."
 					possible_values="'upwind', 'centered'"
 		/>
 		<nml_option name="config_drying_safety_height" type="real" default_value="1.0e-10" units="m"
@@ -2559,8 +2567,12 @@
 			 description="horizontal velocity, tangential to an edge"
 			 packages="forwardMode;analysisMode"
 		/>
-		<var name="layerThicknessEdge" type="real" dimensions="nVertLevels nEdges Time" units="m"
+		<var name="layerThicknessEdgeMean" type="real" dimensions="nVertLevels nEdges Time" units="m"
 			 description="layer thickness averaged from cell center to edges"
+			 packages="forwardMode;analysisMode"
+		/>
+		<var name="layerThicknessEdgeFlux" type="real" dimensions="nVertLevels nEdges Time" units="m"
+			 description="layer thickness used for fluxes through edges. May be centered, upwinded, or a combination of the two."
 			 packages="forwardMode;analysisMode"
 		/>
 		<var name="layerThicknessVertex" type="real" dimensions="nVertLevels nVertices Time" units="m"
